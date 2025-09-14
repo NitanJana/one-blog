@@ -1,4 +1,3 @@
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import type { JSONContent } from '@tiptap/react';
 import React from 'react';
@@ -14,7 +13,7 @@ export default function Writer() {
   const toggleFillerHighlight = () => setFillerHighlight((prev) => !prev);
 
   return (
-    <ScrollArea className="h-svh">
+    <div className="h-svh">
       <div
         className={cn(
           'relative h-full',
@@ -33,6 +32,6 @@ export default function Writer() {
         </div>
         <Tiptap onUpdate={setJSON} />
       </div>
-    </ScrollArea>
+    </div>
   );
 }
