@@ -2,7 +2,7 @@ import { Focus, Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor, type JSONContent } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AttachLinkButton from './attach-link-button-with-popover';
 import FillerWordHighlight from './extensions/filler-word-highlight';
 
@@ -11,21 +11,25 @@ export default function Tiptap({
 }: {
   onUpdate: (content: JSONContent) => void;
 }) {
-  // set --vh on mount + resize
+  const [scrollMargin, setScrollMargin] = useState(0);
+
+  // keep --vh + scrollMargin synced with real viewport height
   useEffect(() => {
-    const setVh = () => {
+    const updateSizes = () => {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
+      setScrollMargin(Math.max(20, Math.floor((vh * 100) / 2) - 40));
     };
-    setVh();
-    window.addEventListener('resize', setVh);
-    return () => window.removeEventListener('resize', setVh);
+
+    updateSizes();
+    window.addEventListener('resize', updateSizes);
+    return () => window.removeEventListener('resize', updateSizes);
   }, []);
 
   const editor = useEditor({
     editorProps: {
-      scrollThreshold: window.innerHeight / 2 - 40,
-      scrollMargin: window.innerHeight / 2 - 40,
+      scrollThreshold: scrollMargin,
+      scrollMargin: scrollMargin,
     },
     extensions: [
       StarterKit,
@@ -52,8 +56,9 @@ export default function Tiptap({
       <EditorContent
         editor={editor}
         style={{
-          // minHeight = 200 * var(--vh)
+          // min height = 200% viewport
           minHeight: 'calc(var(--vh, 1vh) * 200)',
+          // center content initially
           paddingTop: 'calc(var(--vh, 1vh) * 50)',
           paddingBottom: 'calc(var(--vh, 1vh) * 50)',
         }}
