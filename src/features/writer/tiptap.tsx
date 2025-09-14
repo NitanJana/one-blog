@@ -2,7 +2,7 @@ import { Focus, Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor, type JSONContent } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
-import React from 'react';
+import { useEffect } from 'react';
 import AttachLinkButton from './attach-link-button-with-popover';
 import FillerWordHighlight from './extensions/filler-word-highlight';
 
@@ -11,24 +11,21 @@ export default function Tiptap({
 }: {
   onUpdate: (content: JSONContent) => void;
 }) {
-  const [vh, setVh] = React.useState(
-    typeof window !== 'undefined' ? window.innerHeight : 800,
-  );
-
-  React.useEffect(() => {
-    const onResize = () => setVh(window.innerHeight);
-    onResize();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+  // set --vh on mount + resize
+  useEffect(() => {
+    const setVh = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+    setVh();
+    window.addEventListener('resize', setVh);
+    return () => window.removeEventListener('resize', setVh);
   }, []);
-
-  const scrollMarginPx = Math.max(20, Math.floor(vh / 2) - 40);
 
   const editor = useEditor({
     editorProps: {
-      // ProseMirror expects pixel values
-      scrollThreshold: scrollMarginPx,
-      scrollMargin: scrollMarginPx,
+      scrollThreshold: window.innerHeight / 2 - 40,
+      scrollMargin: window.innerHeight / 2 - 40,
     },
     extensions: [
       StarterKit,
@@ -44,11 +41,6 @@ export default function Tiptap({
     },
   });
 
-  // initial minimum height = 2 * viewport, but it can grow beyond that
-  const minHeightPx = `${vh * 2}px`;
-  const padTopPx = `${vh / 2}px`;
-  const padBottomPx = `${vh / 2}px`;
-
   return (
     <div className="h-full">
       {editor && (
@@ -59,11 +51,11 @@ export default function Tiptap({
 
       <EditorContent
         editor={editor}
-        // allow growth by using minHeight instead of fixed height
         style={{
-          minHeight: minHeightPx,
-          paddingTop: padTopPx,
-          paddingBottom: padBottomPx,
+          // minHeight = 200 * var(--vh)
+          minHeight: 'calc(var(--vh, 1vh) * 200)',
+          paddingTop: 'calc(var(--vh, 1vh) * 50)',
+          paddingBottom: 'calc(var(--vh, 1vh) * 50)',
         }}
         className="prose font-ibm-sans dark:prose-invert mx-auto max-w-4xl p-6"
       />
