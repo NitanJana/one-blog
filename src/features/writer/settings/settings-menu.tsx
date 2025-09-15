@@ -21,12 +21,16 @@ export default function SettingsMenu({
   toggleFillerHighlight,
   focusMode,
   toggleFocus,
+  showCharacterCount,
+  toggleCharacterCount,
   curJSON,
 }: {
   fillerHighlight: boolean;
   toggleFillerHighlight: () => void;
   focusMode: boolean;
   toggleFocus: () => void;
+  showCharacterCount: boolean;
+  toggleCharacterCount: () => void;
   curJSON: JSONContent | null;
 }) {
   const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
@@ -61,6 +65,12 @@ export default function SettingsMenu({
               onCheckedChange={toggleFocus}
             >
               Focus Mode
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={showCharacterCount}
+              onCheckedChange={toggleCharacterCount}
+            >
+              Show Character Count
             </DropdownMenuCheckboxItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
