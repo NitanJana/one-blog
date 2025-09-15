@@ -1,4 +1,4 @@
-import { Focus, Placeholder } from '@tiptap/extensions';
+import { CharacterCount, Focus, Placeholder } from '@tiptap/extensions';
 import {
   EditorContent,
   useEditor,
@@ -10,7 +10,6 @@ import StarterKit from '@tiptap/starter-kit';
 import AttachLinkButton from './attach-link-button-with-popover';
 import CharacterWordCounter from './character-word-counter';
 import FillerWordHighlight from './extensions/filler-word-highlight';
-import { CharacterCount } from '@tiptap/extensions';
 
 export default function Tiptap({
   onUpdate,
