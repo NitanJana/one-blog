@@ -29,7 +29,9 @@ export default function Tiptap({
         placeholder: 'Start writing whatever you feel...',
       }),
       FillerWordHighlight,
-      CharacterCount,
+      CharacterCount.configure({
+        wordCounter: (text) => (text.match(/\b\w+\b/g) || []).length,
+      }),
     ],
     content: '',
     onUpdate: ({ editor }) => {
