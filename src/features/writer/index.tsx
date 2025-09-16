@@ -8,12 +8,13 @@ import Tiptap from './tiptap';
 export default function Writer() {
   const [focusMode, setFocusMode] = React.useState(true);
   const [fillerHighlight, setFillerHighlight] = React.useState(true);
-  const [showCharacterCount, setShowCharacterCount] = React.useState(true);
   const [curJSON, setJSON] = React.useState<JSONContent | null>(null);
-
+  const [wordCount, setWordCount] = React.useState({
+    charactersCount: 0,
+    wordsCount: 0,
+  });
   const toggleFocus = () => setFocusMode((prev) => !prev);
   const toggleFillerHighlight = () => setFillerHighlight((prev) => !prev);
-  const toggleCharacterCount = () => setShowCharacterCount((prev) => !prev);
 
   return (
     <ScrollArea className="h-svh">
@@ -30,12 +31,11 @@ export default function Writer() {
             toggleFillerHighlight={toggleFillerHighlight}
             focusMode={focusMode}
             toggleFocus={toggleFocus}
-            showCharacterCount={showCharacterCount}
-            toggleCharacterCount={toggleCharacterCount}
             curJSON={curJSON}
+            wordCount={wordCount}
           />
         </div>
-        <Tiptap onUpdate={setJSON} showCharacterCount={showCharacterCount} />
+        <Tiptap onUpdate={setJSON} onWordCountUpdate={setWordCount} />
       </div>
     </ScrollArea>
   );

@@ -15,23 +15,22 @@ import React from 'react';
 import ExportMarkdownDialog from './export-markdown-dialog';
 import FullscreenModeDropdownButton from './fullscreen-mode-dropdown-button';
 import ThemeToggle from './theme-toggle';
+import CharacterWordCounter from '../character-word-counter';
 
 export default function SettingsMenu({
   fillerHighlight,
   toggleFillerHighlight,
   focusMode,
   toggleFocus,
-  showCharacterCount,
-  toggleCharacterCount,
   curJSON,
+  wordCount,
 }: {
   fillerHighlight: boolean;
   toggleFillerHighlight: () => void;
   focusMode: boolean;
   toggleFocus: () => void;
-  showCharacterCount: boolean;
-  toggleCharacterCount: () => void;
   curJSON: JSONContent | null;
+  wordCount: { charactersCount: number; wordsCount: number };
 }) {
   const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
 
@@ -66,16 +65,17 @@ export default function SettingsMenu({
             >
               Focus Mode
             </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={showCharacterCount}
-              onCheckedChange={toggleCharacterCount}
-            >
-              Show Character Count
-            </DropdownMenuCheckboxItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <FullscreenModeDropdownButton />
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <CharacterWordCounter
+              charactersCount={wordCount.charactersCount}
+              wordsCount={wordCount.wordsCount}
+            />
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
