@@ -1,4 +1,4 @@
-import { Focus, Placeholder } from '@tiptap/extensions';
+import { CharacterCount, Focus, Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor, type JSONContent } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
@@ -7,8 +7,13 @@ import FillerWordHighlight from './extensions/filler-word-highlight';
 
 export default function Tiptap({
   onUpdate,
+  onWordCountUpdate,
 }: {
   onUpdate: (content: JSONContent) => void;
+  onWordCountUpdate: (wordCount: {
+    charactersCount: number;
+    wordsCount: number;
+  }) => void;
 }) {
   const editor = useEditor({
     extensions: [
@@ -20,10 +25,17 @@ export default function Tiptap({
         placeholder: 'Start writing whatever you feel...',
       }),
       FillerWordHighlight,
+      CharacterCount.configure({
+        wordCounter: (text) => (text.match(/\b\w+\b/g) || []).length,
+      }),
     ],
     content: '',
     onUpdate: ({ editor }) => {
       onUpdate(editor.getJSON());
+      onWordCountUpdate({
+        charactersCount: editor.storage.characterCount.characters(),
+        wordsCount: editor.storage.characterCount.words(),
+      });
     },
   });
 

@@ -9,7 +9,10 @@ export default function Writer() {
   const [focusMode, setFocusMode] = React.useState(true);
   const [fillerHighlight, setFillerHighlight] = React.useState(true);
   const [curJSON, setJSON] = React.useState<JSONContent | null>(null);
-
+  const [wordCount, setWordCount] = React.useState({
+    charactersCount: 0,
+    wordsCount: 0,
+  });
   const toggleFocus = () => setFocusMode((prev) => !prev);
   const toggleFillerHighlight = () => setFillerHighlight((prev) => !prev);
 
@@ -29,9 +32,10 @@ export default function Writer() {
             focusMode={focusMode}
             toggleFocus={toggleFocus}
             curJSON={curJSON}
+            wordCount={wordCount}
           />
         </div>
-        <Tiptap onUpdate={setJSON} />
+        <Tiptap onUpdate={setJSON} onWordCountUpdate={setWordCount} />
       </div>
     </ScrollArea>
   );
