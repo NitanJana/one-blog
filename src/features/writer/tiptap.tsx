@@ -2,19 +2,25 @@ import { CharacterCount, Focus, Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor, type JSONContent } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
+import { forwardRef, useImperativeHandle } from 'react';
 import AttachLinkButton from './attach-link-button-with-popover';
 import FillerWordHighlight from './extensions/filler-word-highlight';
 
-export default function Tiptap({
-  onUpdate,
-  onWordCountUpdate,
-}: {
-  onUpdate: (content: JSONContent) => void;
-  onWordCountUpdate: (wordCount: {
-    charactersCount: number;
-    wordsCount: number;
-  }) => void;
-}) {
+export interface TiptapRef {
+  loadContent: (content: JSONContent) => void;
+}
+
+const Tiptap = forwardRef<
+  TiptapRef,
+  {
+    onUpdate: (content: JSONContent) => void;
+    onWordCountUpdate: (wordCount: {
+      charactersCount: number;
+      wordsCount: number;
+    }) => void;
+    initialContent?: JSONContent;
+  }
+>(({ onUpdate, onWordCountUpdate, initialContent }, ref) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -29,7 +35,7 @@ export default function Tiptap({
         wordCounter: (text) => (text.match(/\b\w+\b/g) || []).length,
       }),
     ],
-    content: '',
+    content: initialContent,
     onUpdate: ({ editor }) => {
       onUpdate(editor.getJSON());
       onWordCountUpdate({
@@ -38,6 +44,14 @@ export default function Tiptap({
       });
     },
   });
+
+  useImperativeHandle(ref, () => ({
+    loadContent: (content: JSONContent) => {
+      if (editor) {
+        editor.commands.setContent(content);
+      }
+    },
+  }));
 
   return (
     <div className="h-full">
@@ -53,4 +67,8 @@ export default function Tiptap({
       />
     </div>
   );
-}
+});
+
+Tiptap.displayName = 'Tiptap';
+
+export default Tiptap;
