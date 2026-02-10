@@ -38,20 +38,7 @@ export default function AIGenerate() {
 
   const findTrendingTopics = useAction(api.ai.findTrendingTopics);
   const generatePost = useAction(api.ai.generatePost);
-  const allTopics = useQuery(api.topics.list);
-
-  const recentDomains = React.useMemo(() => {
-    if (!allTopics) return [];
-    const seen = new Set<string>();
-    return allTopics
-      .filter((t) => {
-        if (seen.has(t.domain)) return false;
-        seen.add(t.domain);
-        return true;
-      })
-      .slice(0, 5)
-      .map((t) => t.domain);
-  }, [allTopics]);
+  const recentDomains = useQuery(api.topics.recentDomains) ?? [];
 
   const reset = () => {
     setDomain('');

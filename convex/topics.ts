@@ -12,6 +12,27 @@ export const list = query({
   },
 });
 
+export const recentDomains = query({
+  args: {},
+  handler: async (ctx) => {
+    const topics = await ctx.db
+      .query('topics')
+      .withIndex('by_created')
+      .order('desc')
+      .collect();
+    const seen = new Set<string>();
+    const domains: string[] = [];
+    for (const t of topics) {
+      if (!seen.has(t.domain)) {
+        seen.add(t.domain);
+        domains.push(t.domain);
+        if (domains.length >= 5) break;
+      }
+    }
+    return domains;
+  },
+});
+
 export const listByDomain = query({
   args: { domain: v.string() },
   handler: async (ctx, args) => {
