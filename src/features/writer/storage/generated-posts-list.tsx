@@ -5,35 +5,34 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useMutation, useQuery } from 'convex/react';
 import { Trash2Icon } from 'lucide-react';
-import { api } from '@convex/_generated/api';
-import type { Id } from '@convex/_generated/dataModel';
+
+type GeneratedPost = {
+  _id: string;
+  title: string;
+  content: string;
+  wordCount: number;
+  domain: string;
+};
 
 export default function GeneratedPostsList({
+  posts,
   onSelect,
+  onDelete,
 }: {
+  posts: GeneratedPost[];
   onSelect: (post: { title: string; content: string }) => void;
+  onDelete: (e: React.MouseEvent, postId: string) => void;
 }) {
-  const generatedPosts = useQuery(api.posts.list);
-  const removePost = useMutation(api.posts.remove);
-
-  const handleDelete = (e: React.MouseEvent, postId: string) => {
-    e.stopPropagation();
-    removePost({ id: postId as Id<'posts'> });
-  };
-
-  if (!generatedPosts || generatedPosts.length === 0) return null;
+  if (posts.length === 0) return null;
 
   return (
     <>
       <DropdownMenuSeparator />
-      <DropdownMenuLabel>
-        Generated Posts ({generatedPosts.length})
-      </DropdownMenuLabel>
+      <DropdownMenuLabel>Generated Posts ({posts.length})</DropdownMenuLabel>
       <ScrollArea className="max-h-64">
         <div className="grid gap-1 p-2">
-          {generatedPosts.map((post) => (
+          {posts.map((post) => (
             <DropdownMenuItem
               key={post._id}
               className="flex-col items-start gap-1 p-3"
@@ -50,7 +49,7 @@ export default function GeneratedPostsList({
                   variant="ghost"
                   size="icon"
                   className="hover:text-destructive size-6 shrink-0 opacity-50 hover:opacity-100"
-                  onClick={(e) => handleDelete(e, post._id)}
+                  onClick={(e) => onDelete(e, post._id)}
                 >
                   <Trash2Icon className="size-3.5" />
                 </Button>

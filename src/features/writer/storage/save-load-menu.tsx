@@ -12,8 +12,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import type { StoredEntry } from '@/lib/storage';
 import { isStorageFull } from '@/lib/storage';
 import type { JSONContent } from '@tiptap/react';
+import { useMutation, useQuery } from 'convex/react';
 import { Trash2Icon } from 'lucide-react';
 import React from 'react';
+import { api } from '@convex/_generated/api';
+import type { Id } from '@convex/_generated/dataModel';
 import GeneratedPostsList from './generated-posts-list';
 import LoadConfirmationDialog from './load-confirmation-dialog';
 import ReplaceEntryDialog from './replace-entry-dialog';
@@ -35,6 +38,14 @@ export default function SaveLoadMenu({
     title: string;
     content: string;
   } | null>(null);
+
+  const generatedPosts = useQuery(api.posts.list);
+  const removePost = useMutation(api.posts.remove);
+
+  const handleDeleteGeneratedPost = (e: React.MouseEvent, postId: string) => {
+    e.stopPropagation();
+    removePost({ id: postId as Id<'posts'> });
+  };
 
   const loadEntries = React.useCallback(() => {
     const stored = localStorage.getItem('one-blog-entries');
@@ -160,7 +171,11 @@ export default function SaveLoadMenu({
               </div>
             )}
           </ScrollArea>
-          <GeneratedPostsList onSelect={handleGeneratedPostClick} />
+          <GeneratedPostsList
+            posts={generatedPosts ?? []}
+            onSelect={handleGeneratedPostClick}
+            onDelete={handleDeleteGeneratedPost}
+          />
         </DropdownMenuContent>
       </DropdownMenu>
 

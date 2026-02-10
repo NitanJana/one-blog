@@ -111,7 +111,7 @@ export default function AIGenerate() {
         className="fixed right-4 bottom-4 z-50 gap-1.5"
       >
         <Sparkles className="size-4" />
-        AI Generate
+        Generate
       </Button>
     );
   }
