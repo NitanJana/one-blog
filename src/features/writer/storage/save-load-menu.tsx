@@ -12,8 +12,11 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import type { StoredEntry } from '@/lib/storage';
 import { isStorageFull } from '@/lib/storage';
 import type { JSONContent } from '@tiptap/react';
+import { useMutation, useQuery } from 'convex/react';
 import { Trash2Icon } from 'lucide-react';
 import React from 'react';
+import { api } from '../../../../convex/_generated/api';
+import type { Id } from '../../../../convex/_generated/dataModel';
 import LoadConfirmationDialog from './load-confirmation-dialog';
 import ReplaceEntryDialog from './replace-entry-dialog';
 
@@ -21,7 +24,7 @@ export default function SaveLoadMenu({
   onLoadEntry,
   onSave,
 }: {
-  onLoadEntry: (content: JSONContent, entryId?: string) => void;
+  onLoadEntry: (content: JSONContent | string, entryId?: string) => void;
   onSave: (replaceEntryId?: string) => void;
 }) {
   const [entries, setEntries] = React.useState<StoredEntry[]>([]);
@@ -30,6 +33,13 @@ export default function SaveLoadMenu({
   const [selectedEntry, setSelectedEntry] = React.useState<StoredEntry | null>(
     null,
   );
+  const [selectedGeneratedPost, setSelectedGeneratedPost] = React.useState<{
+    title: string;
+    content: string;
+  } | null>(null);
+
+  const generatedPosts = useQuery(api.posts.list);
+  const removePost = useMutation(api.posts.remove);
 
   const loadEntries = React.useCallback(() => {
     const stored = localStorage.getItem('one-blog-entries');
@@ -55,6 +65,7 @@ export default function SaveLoadMenu({
   };
 
   const handleLoadClick = (entry: StoredEntry) => {
+    setSelectedGeneratedPost(null);
     setSelectedEntry(entry);
     setLoadConfirmOpen(true);
   };
@@ -64,7 +75,25 @@ export default function SaveLoadMenu({
       onLoadEntry(selectedEntry.content, selectedEntry.id);
       setLoadConfirmOpen(false);
       setSelectedEntry(null);
+    } else if (selectedGeneratedPost) {
+      onLoadEntry(selectedGeneratedPost.content);
+      setLoadConfirmOpen(false);
+      setSelectedGeneratedPost(null);
     }
+  };
+
+  const handleGeneratedPostClick = (post: {
+    title: string;
+    content: string;
+  }) => {
+    setSelectedEntry(null);
+    setSelectedGeneratedPost(post);
+    setLoadConfirmOpen(true);
+  };
+
+  const handleDeleteGeneratedPost = (e: React.MouseEvent, postId: string) => {
+    e.stopPropagation();
+    removePost({ id: postId as Id<'posts'> });
   };
 
   const handleDeleteEntry = (e: React.MouseEvent, entryId: string) => {
@@ -141,6 +170,49 @@ export default function SaveLoadMenu({
               </div>
             )}
           </ScrollArea>
+          {generatedPosts && generatedPosts.length > 0 && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>
+                Generated Posts ({generatedPosts.length})
+              </DropdownMenuLabel>
+              <ScrollArea className="max-h-64">
+                <div className="grid gap-1 p-2">
+                  {generatedPosts.map((post) => (
+                    <DropdownMenuItem
+                      key={post._id}
+                      className="flex-col items-start gap-1 p-3"
+                      onSelect={() =>
+                        handleGeneratedPostClick({
+                          title: post.title,
+                          content: post.content,
+                        })
+                      }
+                    >
+                      <div className="flex w-full items-start justify-between gap-2">
+                        <span className="text-sm font-medium">
+                          {post.title}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="hover:text-destructive size-6 shrink-0 opacity-50 hover:opacity-100"
+                          onClick={(e) =>
+                            handleDeleteGeneratedPost(e, post._id)
+                          }
+                        >
+                          <Trash2Icon className="size-3.5" />
+                        </Button>
+                      </div>
+                      <span className="text-muted-foreground text-xs">
+                        {post.wordCount} words • {post.domain}
+                      </span>
+                    </DropdownMenuItem>
+                  ))}
+                </div>
+              </ScrollArea>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -154,7 +226,7 @@ export default function SaveLoadMenu({
       <LoadConfirmationDialog
         open={loadConfirmOpen}
         onOpenChange={setLoadConfirmOpen}
-        entryTitle={selectedEntry?.title || ''}
+        entryTitle={selectedEntry?.title || selectedGeneratedPost?.title || ''}
         onConfirm={handleLoadConfirm}
       />
     </>

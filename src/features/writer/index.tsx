@@ -58,7 +58,7 @@ export default function Writer() {
     }
   }, [curJSON, wordCount, debouncedAutoSave]);
 
-  const handleLoadEntry = (content: JSONContent, entryId?: string) => {
+  const handleLoadEntry = (content: JSONContent | string, entryId?: string) => {
     if (tiptapRef.current) {
       tiptapRef.current.loadContent(content);
     }
