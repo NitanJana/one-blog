@@ -1,4 +1,4 @@
-import AIGenerate from '@/components/ai-generate';
+import AIGenerate from '@/features/ai-writer';
 import Writer from '@/features/writer';
 
 export default function App() {
