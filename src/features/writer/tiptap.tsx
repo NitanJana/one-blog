@@ -3,11 +3,12 @@ import { EditorContent, useEditor, type JSONContent } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import { forwardRef, useImperativeHandle } from 'react';
+import { Markdown } from 'tiptap-markdown';
 import AttachLinkButton from './attach-link-button-with-popover';
 import FillerWordHighlight from './extensions/filler-word-highlight';
 
 export interface TiptapRef {
-  loadContent: (content: JSONContent) => void;
+  loadContent: (content: JSONContent | string) => void;
 }
 
 const Tiptap = forwardRef<
@@ -34,6 +35,7 @@ const Tiptap = forwardRef<
       CharacterCount.configure({
         wordCounter: (text) => (text.match(/\b\w+\b/g) || []).length,
       }),
+      Markdown,
     ],
     content: initialContent,
     onUpdate: ({ editor }) => {
@@ -46,7 +48,7 @@ const Tiptap = forwardRef<
   });
 
   useImperativeHandle(ref, () => ({
-    loadContent: (content: JSONContent) => {
+    loadContent: (content: JSONContent | string) => {
       if (editor) {
         editor.commands.setContent(content);
       }
