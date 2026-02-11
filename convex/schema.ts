@@ -3,6 +3,7 @@ import { v } from 'convex/values';
 
 export default defineSchema({
   topics: defineTable({
+    userId: v.string(),
     domain: v.string(),
     name: v.string(),
     searchVolume: v.string(),
@@ -10,9 +11,11 @@ export default defineSchema({
     reason: v.string(),
     createdAt: v.number(),
   })
-    .index('by_domain', ['domain'])
+    .index('by_user', ['userId'])
+    .index('by_user_domain', ['userId', 'domain'])
     .index('by_created', ['createdAt']),
   posts: defineTable({
+    userId: v.string(),
     title: v.string(),
     content: v.string(),
     status: v.union(
@@ -27,6 +30,7 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   })
-    .index('by_status', ['status'])
+    .index('by_user', ['userId'])
+    .index('by_user_status', ['userId', 'status'])
     .index('by_created', ['createdAt']),
 });

@@ -4,9 +4,14 @@ import { mutation, query } from './_generated/server';
 export const list = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+
     return await ctx.db
       .query('topics')
-      .withIndex('by_created')
+      .withIndex('by_user', (q) => q.eq('userId', identity.subject))
       .order('desc')
       .collect();
   },
@@ -15,9 +20,14 @@ export const list = query({
 export const recentDomains = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+
     const topics = await ctx.db
       .query('topics')
-      .withIndex('by_created')
+      .withIndex('by_user', (q) => q.eq('userId', identity.subject))
       .order('desc')
       .collect();
     const seen = new Set<string>();
@@ -36,15 +46,23 @@ export const recentDomains = query({
 export const listByDomain = query({
   args: { domain: v.string() },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+
     return await ctx.db
       .query('topics')
-      .withIndex('by_domain', (q) => q.eq('domain', args.domain))
+      .withIndex('by_user_domain', (q) =>
+        q.eq('userId', identity.subject).eq('domain', args.domain),
+      )
       .collect();
   },
 });
 
 export const createBatch = mutation({
   args: {
+    userId: v.string(),
     domain: v.string(),
     topics: v.array(
       v.object({
@@ -56,9 +74,15 @@ export const createBatch = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || identity.subject !== args.userId) {
+      throw new Error('Unauthorized');
+    }
+
     const now = Date.now();
     for (const topic of args.topics) {
       await ctx.db.insert('topics', {
+        userId: args.userId,
         domain: args.domain,
         name: topic.name,
         searchVolume: topic.searchVolume,

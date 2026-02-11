@@ -36,6 +36,11 @@ const extractText = (response: OpenAI.Responses.Response): string => {
 export const findTrendingTopics = action({
   args: { domain: v.string() },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error('Unauthorized: Please sign in to use AI features');
+    }
+
     const client = getClient();
 
     const response = await client.responses.create({
@@ -64,6 +69,7 @@ export const findTrendingTopics = action({
     }
 
     await ctx.runMutation(api.topics.createBatch, {
+      userId: identity.subject,
       domain: args.domain,
       topics,
     });
@@ -83,6 +89,11 @@ export const generatePost = action({
     content: string;
     wordCount: number;
   }> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error('Unauthorized: Please sign in to use AI features');
+    }
+
     const client = getClient();
 
     // Research the topic
@@ -140,6 +151,7 @@ export const generatePost = action({
 
     // Save to database
     const postId = await ctx.runMutation(api.posts.create, {
+      userId: identity.subject,
       title,
       content,
       status: 'published',

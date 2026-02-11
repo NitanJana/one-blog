@@ -1,5 +1,6 @@
+import { SignInButton, useAuth, UserButton } from '@clerk/clerk-react';
 import { useAction, useQuery } from 'convex/react';
-import { Sparkles, X } from 'lucide-react';
+import { Lock, Sparkles, X } from 'lucide-react';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ export type GeneratedPost = {
 type Step = 'input' | 'topics' | 'generating' | 'done';
 
 export default function AIGenerate() {
+  const { isSignedIn, isLoaded } = useAuth();
   const [open, setOpen] = React.useState(false);
   const [domain, setDomain] = React.useState('');
   const [step, setStep] = React.useState<Step>('input');
@@ -89,17 +91,37 @@ export default function AIGenerate() {
     }
   };
 
+  if (!isLoaded) {
+    return null;
+  }
+
+  if (!isSignedIn) {
+    return (
+      <div className="fixed right-4 bottom-4 z-50 flex items-center gap-2">
+        <SignInButton mode="modal">
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <Lock className="size-4" />
+            Sign in to Generate
+          </Button>
+        </SignInButton>
+      </div>
+    );
+  }
+
   if (!open) {
     return (
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => setOpen(true)}
-        className="fixed right-4 bottom-4 z-50 gap-1.5"
-      >
-        <Sparkles className="size-4" />
-        Generate
-      </Button>
+      <div className="fixed right-4 bottom-4 z-50 flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setOpen(true)}
+          className="gap-1.5"
+        >
+          <Sparkles className="size-4" />
+          Generate
+        </Button>
+        <UserButton afterSignOutUrl="/" />
+      </div>
     );
   }
 
