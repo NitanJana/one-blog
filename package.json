@@ -9,6 +9,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "preview": "vite preview",
+    "mcp:dev": "pnpm --dir mcp-server dev",
+    "mcp:build": "pnpm --dir mcp-server build",
+    "mcp:start": "pnpm --dir mcp-server start",
     "prepare": "husky"
   },
   "lint-staged": {
