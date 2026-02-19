@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { type InferSchema, type ToolMetadata } from 'xmcp';
 import { findTrendingTopics, type Provider } from '../lib/convex-client';
 import { requireSessionUserId } from '../lib/clerk-session';
+import { toToolResult } from '../lib/tool-result';
 
 export const schema = {
   domain: z.string().min(1),
@@ -41,18 +42,8 @@ export default async function topicsFindTrendingTool({
     fetchedAt: Date.now(),
   };
 
-  return {
-    content: [
-      {
-        type: 'text' as const,
-        text: `Found ${topics.length} trending topic(s) for "${domain}".`,
-      },
-      {
-        // Fallback for clients/proxies that ignore structuredContent.
-        type: 'text' as const,
-        text: JSON.stringify(result),
-      },
-    ],
-    structuredContent: result,
-  };
+  return toToolResult(
+    result,
+    `Found ${topics.length} trending topic(s) for "${domain}".`,
+  );
 }

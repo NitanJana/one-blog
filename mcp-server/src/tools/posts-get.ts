@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { type InferSchema, type ToolMetadata } from 'xmcp';
 import { getPost } from '../lib/convex-client';
 import { requireSessionUserId } from '../lib/clerk-session';
+import { toToolResult } from '../lib/tool-result';
 
 export const schema = {
   postId: z.string().min(1),
@@ -25,18 +26,5 @@ export default async function postsGetTool({
   if (!post) {
     throw new Error('Post not found');
   }
-  return {
-    content: [
-      {
-        type: 'text' as const,
-        text: `Loaded post: ${post.title}`,
-      },
-      {
-        // Fallback for clients/proxies that ignore structuredContent.
-        type: 'text' as const,
-        text: JSON.stringify(post),
-      },
-    ],
-    structuredContent: post,
-  };
+  return toToolResult(post, `Loaded post: ${post.title}`);
 }

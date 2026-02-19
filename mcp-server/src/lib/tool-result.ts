@@ -3,22 +3,40 @@ type TextContent = {
   text: string;
 };
 
-type ToolResult = {
+type StructuredContent = Record<string, unknown>;
+
+type ToolResult<T extends StructuredContent> = {
   content: TextContent[];
-  structuredContent: unknown;
+  structuredContent: T;
 };
 
-export const toToolResult = (
-  structuredContent: unknown,
+type ToolResultOptions = {
+  includeJsonFallback?: boolean;
+};
+
+export const toToolResult = <T extends StructuredContent>(
+  structuredContent: T,
   text: string,
-): ToolResult => {
+  options: ToolResultOptions = {},
+): ToolResult<T> => {
+  const includeJsonFallback = options.includeJsonFallback ?? true;
+  const content: TextContent[] = [
+    {
+      type: 'text',
+      text,
+    },
+  ];
+
+  if (includeJsonFallback) {
+    content.push({
+      // Fallback for clients/proxies that ignore structuredContent.
+      type: 'text',
+      text: JSON.stringify(structuredContent),
+    });
+  }
+
   return {
-    content: [
-      {
-        type: 'text',
-        text,
-      },
-    ],
+    content,
     structuredContent,
   };
 };
