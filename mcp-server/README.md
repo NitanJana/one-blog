@@ -5,13 +5,13 @@ Remote MCP server for One Blog, built with `xmcp`.
 ## Run
 
 ```bash
-pnpm --dir mcp-server install
-pnpm mcp:dev
+pnpm install
+pnpm dev
 ```
 
 ## Env
 
-Copy `mcp-server/.env.example` to `mcp-server/.env` and set:
+Copy `.env.example` to `.env` and set:
 
 - `MCP_CONVEX_URL`
 - `MCP_SERVICE_SECRET`
