@@ -7,6 +7,10 @@ const config: XmcpConfig = {
     prompts: false,
     resources: false,
   },
+  template: {
+    name: 'one-blog',
+    description: 'One Blog MCP server',
+  },
 };
 
 export default config;
