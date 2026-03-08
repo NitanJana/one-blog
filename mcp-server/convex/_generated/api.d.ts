@@ -8,23 +8,13 @@
  * @module
  */
 
-import type * as ai from '../ai.js';
-import type * as mcp from '../mcp.js';
-import type * as posts from '../posts.js';
-import type * as topics from '../topics.js';
-
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
 } from 'convex/server';
 
-declare const fullApi: ApiFromModules<{
-  ai: typeof ai;
-  mcp: typeof mcp;
-  posts: typeof posts;
-  topics: typeof topics;
-}>;
+declare const fullApi: ApiFromModules<{}>;
 
 /**
  * A utility for referencing Convex functions in your app's public API.
