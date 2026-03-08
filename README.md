@@ -16,7 +16,7 @@ The MVP would be the above features with markdown export.
 ## Inspiration
 
 > The artist is a collector. Not a hoarder, mind you, there's a difference: Hoarders collect indiscriminately, artists collect selectively. They only collect things that they really love.
-> —Austin Kleon
+> -Austin Kleon
 
 - [Daylight](https://daylightcomputer.com/): The early inspiration comes from Daylight's distraction free writing mode. I never tried it but looked amazing.
 - [iA Writer](https://ia.net/writer): First heard of this from my initial conversation with ChatGPT, then a few more folks from the [Frontend Hire](https://frontendhire.com/) community and reddit suggested this tool. My problem is that it is not web-based.
@@ -31,3 +31,7 @@ The product I want to build:
 - Exports directly to markdown with YAML data
 
 I am still experimenting and thoughts could change as I build.
+
+## MCP Server (POC)
+
+MCP server docs and setup live in `mcp-server/README.md`.
